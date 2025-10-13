@@ -3,6 +3,7 @@ import BooksIcon from "@/components/icons/BooksIcon";
 import { useTheme } from "@react-navigation/native";
 import React from "react";
 import {
+    ActivityIndicator,
     ScrollView,
     StyleSheet,
     Text,
@@ -16,6 +17,7 @@ type Props = {
     toggleInterest: (interest: string) => void;
     back: () => void;
     complete: () => void;
+    isLoading?: boolean;
 };
 
 export default function Step3({
@@ -24,6 +26,7 @@ export default function Step3({
     toggleInterest,
     back,
     complete,
+    isLoading,
 }: Props) {
     const theme = useTheme();
 
@@ -98,11 +101,19 @@ export default function Step3({
                 <TouchableOpacity
                     style={[
                         styles.continueButton,
-                        { backgroundColor: theme.colors.primary },
+                        {
+                            backgroundColor: theme.colors.primary,
+                            opacity: isLoading ? 0.7 : 1,
+                        },
                     ]}
                     onPress={complete}
+                    disabled={isLoading}
                 >
-                    <Text style={styles.continueText}>Complete</Text>
+                    {isLoading ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                        <Text style={styles.continueText}>Continue</Text>
+                    )}
                 </TouchableOpacity>
             </View>
         </ScrollView>

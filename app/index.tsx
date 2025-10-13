@@ -1,14 +1,24 @@
 import Welcome from "@/components/Welcome";
+import { supabase } from "@/lib/supabase";
 import { useTheme } from "@react-navigation/native";
-import { Link } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Link, router } from "expo-router";
+import { useContext } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SessionContext } from "./_layout"; // adjust path if necessary
 
-export default function AboutScreen() {
-    const theme = useTheme(); // ✅ get theme colors
-    const user = null; // to replace with actual user authentication logic
+export default function IndexScreen() {
+    const theme = useTheme();
+    const session = useContext(SessionContext);
+
+    const user = session?.user ?? null;
 
     if (!user) {
         return <Welcome />;
+    }
+
+    async function signOut() {
+        await supabase.auth.signOut();
+        router.replace("/sign-in");
     }
 
     return (
@@ -19,8 +29,11 @@ export default function AboutScreen() {
             ]}
         >
             <Text style={[styles.text, { color: theme.colors.text }]}>
-                Index screen
+                {`Welcome back, ${user.email}`}
             </Text>
+            <TouchableOpacity onPress={signOut} style={{ marginTop: 20 }}>
+                <Text style={{ color: theme.colors.primary }}>Sign Out</Text>
+            </TouchableOpacity>
             <Link
                 href="/about"
                 style={[styles.button, { color: theme.colors.primary }]}

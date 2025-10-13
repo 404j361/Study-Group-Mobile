@@ -2,7 +2,6 @@
 import { useTheme } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
-    Alert,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -10,6 +9,8 @@ import {
     View,
 } from "react-native";
 
+import { supabase } from "@/lib/supabase";
+import Complete from "./Complete";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
 import Step3 from "./Step3";
@@ -47,6 +48,8 @@ export default function SignUpIndex() {
     const [password, setPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isCompleted, setIsCompleted] = useState<boolean>(false);
 
     // Per-field error state
     const [errors, setErrors] = useState<{
@@ -67,9 +70,11 @@ export default function SignUpIndex() {
         }
     };
 
-    const handleContinueStep2 = () => {
+    const handleCompleteStep2 = async () => {
+        setIsLoading(true);
         const newErrors: typeof errors = {};
 
+        // Basic validation
         if (!fullName.trim()) newErrors.fullName = "Full Name is required";
         if (role === "Student" && !studentId.trim())
             newErrors.studentId = "Student ID is required";
@@ -84,17 +89,86 @@ export default function SignUpIndex() {
             newErrors.confirmPassword = "Passwords do not match";
 
         if (Object.keys(newErrors).length > 0) {
+            setIsLoading(false);
             setErrors(newErrors);
-            return; // stop navigation
+            return;
         }
 
         setErrors({});
-        setStep(3);
+
+        try {
+            // Register user in Auth + DB
+            const { data: authData, error: authError } =
+                await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            fullName,
+                            role,
+                            studentId: role === "Student" ? studentId : null,
+                        },
+                    },
+                });
+
+            if (authError) {
+                setErrors((prev) => ({ ...prev, email: authError.message }));
+                return;
+            }
+
+            // Insert user into DB
+            const { data: dbData, error: dbError } = await supabase
+                .from("users")
+                .insert([
+                    {
+                        id: authData.user?.id,
+                        fullName,
+                        role: role === "Student" ? "student" : "admin",
+                        studentId: role === "Student" ? studentId : null,
+                        email,
+                    },
+                ]);
+
+            if (dbError) {
+                setErrors((prev) => ({ ...prev, email: dbError.message }));
+                return;
+            }
+
+            setStep(3);
+        } catch (err) {
+            console.error("Unexpected error:", err);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const handleComplete = () => {
-        Alert.alert("Sign Up Complete!", `Welcome ${fullName}`);
+    const handleCompleteStep3 = async () => {
+        setIsLoading(true);
+        try {
+            const user = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { data, error } = await supabase
+                .from("users")
+                .update({ interests: selectedInterests })
+                .eq("id", user.data.user?.id);
+
+            if (error) {
+                return;
+            }
+
+            // Redirect to register-success page
+            // If using react-navigation:
+            // navigation.navigate("RegisterSuccess");
+            setIsCompleted(true);
+        } catch (err) {
+            console.error("Unexpected error:", err);
+        } finally {
+            setIsLoading(false);
+        }
     };
+
+    if (isCompleted) return <Complete />;
 
     return (
         <KeyboardAvoidingView
@@ -133,8 +207,9 @@ export default function SignUpIndex() {
                             setConfirmPassword={setConfirmPassword}
                             errors={errors}
                             back={() => setStep(1)}
-                            next={handleContinueStep2}
+                            next={handleCompleteStep2}
                             setErrors={setErrors}
+                            isLoading={isLoading}
                         />
                     )}
                     {step === 3 && (
@@ -143,7 +218,8 @@ export default function SignUpIndex() {
                             selectedInterests={selectedInterests}
                             toggleInterest={toggleInterest}
                             back={() => setStep(2)}
-                            complete={handleComplete}
+                            complete={handleCompleteStep3}
+                            isLoading={isLoading}
                         />
                     )}
                 </View>

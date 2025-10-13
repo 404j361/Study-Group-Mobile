@@ -1,7 +1,9 @@
 import GraduationCapIcon from "@/components/icons/GraduationCap";
+import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
-import React from "react";
+import React, { useState } from "react";
 import {
+    ActivityIndicator,
     ScrollView,
     StyleSheet,
     Text,
@@ -40,6 +42,7 @@ type Props = {
     >;
     back: () => void;
     next: () => void;
+    isLoading: boolean;
 };
 
 export default function Step2({
@@ -58,11 +61,21 @@ export default function Step2({
     setErrors,
     back,
     next,
+    isLoading,
 }: Props) {
     const theme = useTheme();
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     return (
-        <ScrollView contentContainerStyle={styles.stepContainer}>
+        <ScrollView
+            contentContainerStyle={[
+                styles.container,
+                { backgroundColor: theme.colors.background },
+            ]}
+            keyboardShouldPersistTaps="handled"
+        >
+            {/* Logo */}
             <View style={styles.logoContainer}>
                 <View
                     style={{
@@ -88,164 +101,230 @@ export default function Step2({
             </Text>
 
             {/* Full Name */}
-            <View style={styles.inputGroup}>
+            <View style={styles.inputWrapper}>
                 <Text style={[styles.label, { color: theme.colors.text }]}>
                     Full Name
                 </Text>
-                <TextInput
+                <View
                     style={[
-                        styles.input,
+                        styles.inputContainer,
                         {
                             borderColor: errors.fullName
                                 ? "red"
-                                : theme.colors.text,
-                            color: theme.colors.text,
+                                : theme.colors.border,
                         },
                     ]}
-                    placeholder="Enter your full name"
-                    placeholderTextColor={theme.colors.border}
-                    value={fullName}
-                    onChangeText={(text) => {
-                        setFullName(text);
-                        if (errors.fullName)
-                            setErrors((prev) => ({ ...prev, fullName: "" }));
-                    }}
-                />
+                >
+                    <TextInput
+                        style={[styles.input, { color: theme.colors.text }]}
+                        placeholder="Enter your full name"
+                        placeholderTextColor={theme.colors.text}
+                        value={fullName}
+                        onChangeText={(text) => {
+                            setFullName(text);
+                            if (errors.fullName)
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    fullName: "",
+                                }));
+                        }}
+                    />
+                </View>
                 {errors.fullName && (
-                    <Text style={styles.errorText}>{errors.fullName}</Text>
+                    <Text style={[styles.errorText, { color: "red" }]}>
+                        {errors.fullName}
+                    </Text>
                 )}
             </View>
 
             {/* Student ID */}
             {role === "Student" && (
-                <View style={styles.inputGroup}>
+                <View style={styles.inputWrapper}>
                     <Text style={[styles.label, { color: theme.colors.text }]}>
                         Student ID
                     </Text>
-                    <TextInput
+                    <View
                         style={[
-                            styles.input,
+                            styles.inputContainer,
                             {
                                 borderColor: errors.studentId
                                     ? "red"
-                                    : theme.colors.text,
-                                color: theme.colors.text,
+                                    : theme.colors.border,
                             },
                         ]}
-                        placeholder="Enter your student ID"
-                        placeholderTextColor={theme.colors.border}
-                        value={studentId}
-                        onChangeText={(text) => {
-                            setStudentId(text);
-                            if (errors.studentId)
-                                setErrors((prev) => ({
-                                    ...prev,
-                                    studentId: "",
-                                }));
-                        }}
-                    />
+                    >
+                        <TextInput
+                            style={[styles.input, { color: theme.colors.text }]}
+                            placeholder="Enter your student ID"
+                            placeholderTextColor={theme.colors.text}
+                            value={studentId}
+                            onChangeText={(text) => {
+                                setStudentId(text);
+                                if (errors.studentId)
+                                    setErrors((prev) => ({
+                                        ...prev,
+                                        studentId: "",
+                                    }));
+                            }}
+                        />
+                    </View>
                     {errors.studentId && (
-                        <Text style={styles.errorText}>{errors.studentId}</Text>
+                        <Text style={[styles.errorText, { color: "red" }]}>
+                            {errors.studentId}
+                        </Text>
                     )}
                 </View>
             )}
 
             {/* Email */}
-            <View style={styles.inputGroup}>
+            <View style={styles.inputWrapper}>
                 <Text style={[styles.label, { color: theme.colors.text }]}>
                     Email Address
                 </Text>
-                <TextInput
+                <View
                     style={[
-                        styles.input,
+                        styles.inputContainer,
                         {
                             borderColor: errors.email
                                 ? "red"
-                                : theme.colors.text,
-                            color: theme.colors.text,
+                                : theme.colors.border,
                         },
                     ]}
-                    placeholder="Enter your email"
-                    placeholderTextColor={theme.colors.border}
-                    value={email}
-                    onChangeText={(text) => {
-                        setEmail(text);
-                        if (errors.email)
-                            setErrors((prev) => ({ ...prev, email: "" }));
-                    }}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                />
+                >
+                    <Feather
+                        name="mail"
+                        size={20}
+                        color={theme.colors.text}
+                        style={styles.icon}
+                    />
+                    <TextInput
+                        style={[styles.input, { color: theme.colors.text }]}
+                        placeholder="Enter your email"
+                        placeholderTextColor={theme.colors.text}
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
+                </View>
                 {errors.email && (
-                    <Text style={styles.errorText}>{errors.email}</Text>
+                    <Text style={[styles.errorText, { color: "red" }]}>
+                        {errors.email}
+                    </Text>
                 )}
             </View>
 
             {/* Password */}
-            <View style={styles.inputGroup}>
+            <View style={styles.inputWrapper}>
                 <Text style={[styles.label, { color: theme.colors.text }]}>
                     Password
                 </Text>
-                <TextInput
+                <View
                     style={[
-                        styles.input,
+                        styles.inputContainer,
                         {
                             borderColor: errors.password
                                 ? "red"
-                                : theme.colors.text,
-                            color: theme.colors.text,
+                                : theme.colors.border,
                         },
                     ]}
-                    placeholder="Enter password"
-                    placeholderTextColor={theme.colors.border}
-                    value={password}
-                    onChangeText={(text) => {
-                        setPassword(text);
-                        if (errors.password)
-                            setErrors((prev) => ({ ...prev, password: "" }));
-                    }}
-                    secureTextEntry
-                />
+                >
+                    <Feather
+                        name="lock"
+                        size={20}
+                        color={theme.colors.text}
+                        style={styles.icon}
+                    />
+                    <TextInput
+                        style={[styles.input, { color: theme.colors.text }]}
+                        placeholder="Enter password"
+                        placeholderTextColor={theme.colors.text}
+                        value={password}
+                        onChangeText={(text) => {
+                            setPassword(text);
+                            if (errors.password)
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    password: "",
+                                }));
+                        }}
+                        secureTextEntry={!showPassword}
+                    />
+                    <TouchableOpacity
+                        onPress={() => setShowPassword(!showPassword)}
+                        style={styles.eyeIcon}
+                    >
+                        <Feather
+                            name={showPassword ? "eye" : "eye-off"}
+                            size={20}
+                            color={theme.colors.text}
+                        />
+                    </TouchableOpacity>
+                </View>
                 {errors.password && (
-                    <Text style={styles.errorText}>{errors.password}</Text>
+                    <Text style={[styles.errorText, { color: "red" }]}>
+                        {errors.password}
+                    </Text>
                 )}
             </View>
 
             {/* Confirm Password */}
-            <View style={styles.inputGroup}>
+            <View style={styles.inputWrapper}>
                 <Text style={[styles.label, { color: theme.colors.text }]}>
                     Confirm Password
                 </Text>
-                <TextInput
+                <View
                     style={[
-                        styles.input,
+                        styles.inputContainer,
                         {
                             borderColor: errors.confirmPassword
                                 ? "red"
-                                : theme.colors.text,
-                            color: theme.colors.text,
+                                : theme.colors.border,
                         },
                     ]}
-                    placeholder="Confirm password"
-                    placeholderTextColor={theme.colors.border}
-                    value={confirmPassword}
-                    onChangeText={(text) => {
-                        setConfirmPassword(text);
-                        if (errors.confirmPassword)
-                            setErrors((prev) => ({
-                                ...prev,
-                                confirmPassword: "",
-                            }));
-                    }}
-                    secureTextEntry
-                />
+                >
+                    <Feather
+                        name="lock"
+                        size={20}
+                        color={theme.colors.text}
+                        style={styles.icon}
+                    />
+                    <TextInput
+                        style={[styles.input, { color: theme.colors.text }]}
+                        placeholder="Confirm password"
+                        placeholderTextColor={theme.colors.text}
+                        value={confirmPassword}
+                        onChangeText={(text) => {
+                            setConfirmPassword(text);
+                            if (errors.confirmPassword)
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    confirmPassword: "",
+                                }));
+                        }}
+                        secureTextEntry={!showConfirmPassword}
+                    />
+                    <TouchableOpacity
+                        onPress={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        style={styles.eyeIcon}
+                    >
+                        <Feather
+                            name={showConfirmPassword ? "eye" : "eye-off"}
+                            size={20}
+                            color={theme.colors.text}
+                        />
+                    </TouchableOpacity>
+                </View>
                 {errors.confirmPassword && (
-                    <Text style={styles.errorText}>
+                    <Text style={[styles.errorText, { color: "red" }]}>
                         {errors.confirmPassword}
                     </Text>
                 )}
             </View>
 
+            {/* Navigation Buttons */}
             <View style={styles.navigation}>
                 <TouchableOpacity
                     style={[
@@ -259,11 +338,19 @@ export default function Step2({
                 <TouchableOpacity
                     style={[
                         styles.continueButton,
-                        { backgroundColor: theme.colors.primary },
+                        {
+                            backgroundColor: theme.colors.primary,
+                            opacity: isLoading ? 0.7 : 1,
+                        },
                     ]}
                     onPress={next}
+                    disabled={isLoading}
                 >
-                    <Text style={styles.continueText}>Continue</Text>
+                    {isLoading ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                        <Text style={styles.continueText}>Continue</Text>
+                    )}
                 </TouchableOpacity>
             </View>
         </ScrollView>
@@ -271,13 +358,11 @@ export default function Step2({
 }
 
 const styles = StyleSheet.create({
-    stepContainer: {
+    container: {
         flexGrow: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
+        paddingVertical: 20,
     },
-    logoContainer: { alignItems: "center", marginBottom: 10, padding: 20 },
+    logoContainer: { alignItems: "center", marginBottom: 20 },
     title: {
         fontSize: 28,
         fontWeight: "600",
@@ -285,30 +370,34 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     subtitle: { fontSize: 14, marginBottom: 20, textAlign: "center" },
-    input: { width: "100%", borderWidth: 1, borderRadius: 10, padding: 15 },
-    inputGroup: { width: "100%", marginBottom: 15 },
-    label: { marginBottom: 5, fontWeight: "500" },
-    errorText: { color: "red", marginTop: 5, fontSize: 12 },
+    inputWrapper: { marginBottom: 15 },
+    inputContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        borderWidth: 1,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        height: 50,
+    },
+    icon: { marginRight: 10 },
+    eyeIcon: { marginLeft: "auto" },
+    input: { flex: 1, height: "100%" },
+    label: { fontSize: 15, marginBottom: 5 },
+    errorText: { fontSize: 12, marginTop: 5 },
     navigation: {
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "center",
-        width: "100%",
-        marginTop: 10,
+        marginTop: 20,
     },
     backButton: {
-        marginTop: 20,
         paddingVertical: 15,
-        paddingHorizontal: 20,
         borderWidth: 1,
         borderRadius: 10,
         width: "48%",
         alignItems: "center",
     },
     continueButton: {
-        marginTop: 20,
         paddingVertical: 15,
-        paddingHorizontal: 40,
         borderRadius: 10,
         width: "48%",
         alignItems: "center",

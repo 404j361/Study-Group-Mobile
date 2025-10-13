@@ -5,6 +5,7 @@ import { useTheme } from "@react-navigation/native";
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -222,14 +223,18 @@ export default function SignIn() {
                     onPress={handleSignIn}
                     disabled={loading}
                 >
-                    <Text
-                        style={[
-                            styles.buttonText,
-                            { color: colors.background },
-                        ]}
-                    >
-                        {loading ? "Signing In..." : "Sign In"}
-                    </Text>
+                    {loading ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                        <Text
+                            style={[
+                                styles.buttonText,
+                                { color: colors.background },
+                            ]}
+                        >
+                            {loading ? "Signing In..." : "Sign In"}
+                        </Text>
+                    )}
                 </TouchableOpacity>
 
                 {/* Sign Up Link */}
