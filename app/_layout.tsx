@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { supabase } from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
@@ -19,6 +20,7 @@ export const SessionContext = createContext<Session | null>(null);
 export default function RootLayout() {
     const [isLoading, setIsLoading] = useState(true);
     const [session, setSession] = useState<Session | null>(null);
+    const insets = useSafeAreaInsets();
 
     const colorScheme = useColorScheme();
     const theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
@@ -50,10 +52,12 @@ export default function RootLayout() {
                 <Stack
                     screenOptions={{
                         headerShown: false,
+                        contentStyle: { paddingTop: insets.top },
                     }}
                 >
                     <Stack.Screen name="index" />
                     <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="(landing)" />
                 </Stack>
             </SessionContext.Provider>
         </ThemeProvider>
