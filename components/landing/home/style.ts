@@ -25,16 +25,13 @@ const styles = StyleSheet.create({
     },
     card: {
         width: "48%",
-        backgroundColor: "#fff",
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: "#e5e5e5",
     },
     cardTitle: {
         fontSize: 14,
-        color: "#444",
         marginBottom: 8,
     },
     cardContent: {
@@ -49,7 +46,6 @@ const styles = StyleSheet.create({
     },
     badge: {
         alignSelf: "flex-start",
-        backgroundColor: "#f2f2f2",
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 8,
@@ -61,10 +57,8 @@ const styles = StyleSheet.create({
     progressContainer: {
         marginTop: 16,
         padding: 16,
-        backgroundColor: "#fff",
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: "#e5e5e5",
     },
     progressTitle: {
         fontSize: 18,
@@ -84,13 +78,11 @@ const styles = StyleSheet.create({
     progressBarBackground: {
         width: "100%",
         height: 8,
-        backgroundColor: "#f0f0f0",
         borderRadius: 4,
         marginTop: 4,
     },
     progressBarFill: {
         height: 8,
-        backgroundColor: "#000",
         borderRadius: 4,
     },
 });

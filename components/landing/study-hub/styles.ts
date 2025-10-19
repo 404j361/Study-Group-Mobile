@@ -24,12 +24,10 @@ export const styles = StyleSheet.create({
         width: "48%",
         alignItems: "center",
         gap: 12,
-        backgroundColor: "#fff",
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: "#e5e5e5",
     },
     cardTitle: {
         fontSize: 16,

@@ -22,7 +22,7 @@ export default function LandingLayout() {
                 }}
             />
             <Tabs.Screen
-                name="study-hub/index"
+                name="study-hub"
                 options={{
                     title: "Study Hub",
                     tabBarIcon: ({ color, focused }) => (

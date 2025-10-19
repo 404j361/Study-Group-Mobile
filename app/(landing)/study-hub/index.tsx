@@ -21,7 +21,9 @@ export default function StudyHubIndex() {
                     backgroundColor: theme.colors.background,
                 }}
             >
-                <Text style={styles.mainTitle}>Study Hub</Text>
+                <Text style={{ ...styles.mainTitle, color: theme.colors.text }}>
+                    Study Hub
+                </Text>
                 <Text
                     style={{
                         ...styles.subtitle,
@@ -54,7 +56,7 @@ export default function StudyHubIndex() {
                         />
                     }
                     title="Study Groups"
-                    onPress={() => router.push("/")}
+                    onPress={() => router.push("/study-hub/study-groups")}
                 />
                 <StudyCard
                     icon={

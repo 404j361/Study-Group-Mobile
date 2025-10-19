@@ -1,3 +1,4 @@
+import { useTheme } from "@react-navigation/native";
 import { Text, View } from "react-native";
 import styles from "./style";
 
@@ -15,14 +16,32 @@ export default function StatCard({
     icon,
     change,
 }: StatCardProps) {
+    const theme = useTheme();
     return (
-        <View style={styles.card}>
-            <Text style={styles.cardTitle}>{title}</Text>
-            <View style={styles.cardContent}>
-                <Text style={styles.cardValue}>{value}</Text>
+        <View
+            style={{
+                ...styles.card,
+                backgroundColor: theme.colors.card,
+                borderColor: theme.colors.border,
+            }}
+        >
+            <Text style={{ ...styles.cardTitle, color: theme.colors.text }}>
+                {title}
+            </Text>
+            <View style={{ ...styles.cardContent }}>
+                <Text style={{ ...styles.cardValue, color: theme.colors.text }}>
+                    {value}
+                </Text>
                 {icon}
             </View>
-            <View style={styles.badge}>
+            <View
+                style={{
+                    ...styles.badge,
+                    borderWidth: 1,
+                    borderRadius: 10,
+                    borderColor: theme.colors.text,
+                }}
+            >
                 <Text style={styles.badgeText}>{change}</Text>
             </View>
         </View>

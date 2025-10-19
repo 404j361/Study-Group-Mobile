@@ -37,7 +37,12 @@ export default function LandingIndex() {
                         >
                             Welcome {fullName}!
                         </Text>
-                        <Text style={styles.subtitle}>
+                        <Text
+                            style={{
+                                ...styles.subtitle,
+                                color: theme.colors.text,
+                            }}
+                        >
                             Ready to continue your learning journey?
                         </Text>
                     </View>
@@ -103,7 +108,13 @@ export default function LandingIndex() {
                 </View>
 
                 {/* Weekly Progress */}
-                <View style={styles.progressContainer}>
+                <View
+                    style={{
+                        ...styles.progressContainer,
+                        backgroundColor: theme.colors.card,
+                        borderColor: theme.colors.border,
+                    }}
+                >
                     <View
                         style={{
                             flexDirection: "row",
@@ -117,7 +128,12 @@ export default function LandingIndex() {
                             height={24}
                             color={theme.colors.text}
                         />
-                        <Text style={styles.progressTitle}>
+                        <Text
+                            style={{
+                                ...styles.progressTitle,
+                                color: theme.colors.text,
+                            }}
+                        >
                             This Week’s Progress
                         </Text>
                     </View>
