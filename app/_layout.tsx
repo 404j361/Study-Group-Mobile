@@ -1,11 +1,11 @@
 import { createContext, useEffect, useState } from "react";
+import { useColorScheme } from "react-native";
 import "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { supabase } from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
 import { Stack } from "expo-router";
-import { useColorScheme } from "react-native";
 import Loading from "../components/Loading";
 
 import {
@@ -14,7 +14,7 @@ import {
     ThemeProvider,
 } from "@react-navigation/native";
 
-// ✅ Create a context for session (optional)
+// ✅ Create a context for session
 export const SessionContext = createContext<Session | null>(null);
 
 export default function RootLayout() {
@@ -26,39 +26,51 @@ export default function RootLayout() {
     const theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
 
     useEffect(() => {
-        // Get current session
+        // 1️⃣ Fetch existing session on mount
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
             setIsLoading(false);
         });
 
-        // Subscribe to auth changes
+        // 2️⃣ Subscribe to auth state changes
         const { data: listener } = supabase.auth.onAuthStateChange(
             (_event, session) => {
                 setSession(session);
             }
         );
 
-        return () => {
-            listener.subscription.unsubscribe();
-        };
+        return () => listener.subscription.unsubscribe();
     }, []);
 
+    // 3️⃣ Show loading screen while fetching session
     if (isLoading) return <Loading />;
 
+    // 4️⃣ Conditionally render stacks based on session
     return (
         <ThemeProvider value={theme}>
             <SessionContext.Provider value={session}>
-                <Stack
-                    screenOptions={{
-                        headerShown: false,
-                        contentStyle: { paddingTop: insets.top },
-                    }}
-                >
-                    <Stack.Screen name="index" />
-                    <Stack.Screen name="(auth)" />
-                    <Stack.Screen name="(landing)" />
-                </Stack>
+                {session ? (
+                    // ✅ Authenticated user stack
+                    <Stack
+                        screenOptions={{
+                            headerShown: false,
+                            contentStyle: { paddingTop: insets.top },
+                        }}
+                    >
+                        <Stack.Screen name="(landing)" />
+                    </Stack>
+                ) : (
+                    // ✅ Unauthenticated user stack
+                    <Stack
+                        screenOptions={{
+                            headerShown: false,
+                            contentStyle: { paddingTop: insets.top },
+                        }}
+                    >
+                        <Stack.Screen name="index" />
+                        <Stack.Screen name="(auth)" />
+                    </Stack>
+                )}
             </SessionContext.Provider>
         </ThemeProvider>
     );
