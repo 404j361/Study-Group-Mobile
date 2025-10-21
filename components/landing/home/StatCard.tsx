@@ -42,7 +42,9 @@ export default function StatCard({
                     borderColor: theme.colors.text,
                 }}
             >
-                <Text style={styles.badgeText}>{change}</Text>
+                <Text style={{ ...styles.badgeText, color: theme.colors.text }}>
+                    {change}
+                </Text>
             </View>
         </View>
     );

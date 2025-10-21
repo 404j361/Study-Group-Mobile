@@ -5,7 +5,7 @@ import { ScrollView, Text, View } from "react-native";
 import TrendingIcon from "@/components/icons/TrendingIcon";
 import ProgressRow from "@/components/landing/home/ProgressRow";
 import StatCard from "@/components/landing/home/StatCard";
-import styles from "@/components/landing/home/style.ts";
+import styles from "@/components/landing/home/style";
 import Welcome from "@/components/Welcome";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
