@@ -14,7 +14,6 @@ import {
     ThemeProvider,
 } from "@react-navigation/native";
 
-// ✅ Create a context for session
 export const SessionContext = createContext<Session | null>(null);
 
 export default function RootLayout() {

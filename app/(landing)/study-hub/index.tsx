@@ -67,7 +67,7 @@ export default function StudyHubIndex() {
                         />
                     }
                     title="Flash Cards"
-                    onPress={() => router.push("/")}
+                    onPress={() => router.push("/study-hub/flash-cards")}
                 />
                 <StudyCard
                     icon={

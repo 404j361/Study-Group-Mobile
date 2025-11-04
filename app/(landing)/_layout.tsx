@@ -35,7 +35,7 @@ export default function LandingLayout() {
                 }}
             />
             <Tabs.Screen
-                name="progress/index"
+                name="progress"
                 options={{
                     title: "Progress",
                     tabBarIcon: ({ color, focused }) => (

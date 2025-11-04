@@ -8,25 +8,34 @@ type TimePickerInputProps = {
     label: string;
     value: string;
     onChange: (value: string) => void;
+    mode?: "date" | "time"; // 👈 added this prop
 };
 
 export default function TimePickerInput({
     label,
     value,
     onChange,
+    mode = "time", // 👈 defaults to time
 }: TimePickerInputProps) {
     const theme = useTheme();
     const [showPicker, setShowPicker] = useState(false);
-    const [time, setTime] = useState<Date | undefined>(undefined);
+    const [dateValue, setDateValue] = useState<Date | undefined>(undefined);
 
-    const handleTimeChange = (_: any, selectedTime?: Date) => {
+    const handleChange = (_: any, selectedValue?: Date) => {
         setShowPicker(false);
-        if (selectedTime) {
-            setTime(selectedTime);
-            const formatted = selectedTime.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-            });
+        if (selectedValue) {
+            setDateValue(selectedValue);
+
+            let formatted = "";
+            if (mode === "time") {
+                formatted = selectedValue.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                });
+            } else {
+                formatted = selectedValue.toISOString().split("T")[0]; // yyyy-mm-dd
+            }
+
             onChange(formatted);
         }
     };
@@ -49,10 +58,10 @@ export default function TimePickerInput({
                 onPress={() => setShowPicker(true)}
             >
                 <Text style={{ color: theme.colors.text }}>
-                    {value || "--:-- --"}
+                    {value || (mode === "date" ? "Select date" : "--:-- --")}
                 </Text>
                 <Ionicons
-                    name="time-outline"
+                    name={mode === "date" ? "calendar-outline" : "time-outline"}
                     size={18}
                     color={theme.colors.text}
                 />
@@ -60,11 +69,11 @@ export default function TimePickerInput({
 
             {showPicker && (
                 <DateTimePicker
-                    value={time || new Date()}
-                    mode="time"
+                    value={dateValue || new Date()}
+                    mode={mode}
                     is24Hour={false}
                     display={Platform.OS === "ios" ? "spinner" : "default"}
-                    onChange={handleTimeChange}
+                    onChange={handleChange}
                 />
             )}
         </View>
