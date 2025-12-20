@@ -159,7 +159,7 @@ export default function ProgressIndex() {
         };
 
         if (user) fetchWeeklyStudy();
-    }, [user]);
+    }, [user, tasks]);
 
     useEffect(() => {
         fetchGoals();

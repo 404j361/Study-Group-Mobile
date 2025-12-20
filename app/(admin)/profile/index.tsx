@@ -30,7 +30,6 @@ type UserProfile = {
 
 export default function ProfileIndex() {
     const theme = useTheme();
-
     const [userData, setUserData] = useState<UserProfile | null>(null);
     const [stats, setStats] = useState({
         totalStudyHours: 0,
@@ -44,6 +43,7 @@ export default function ProfileIndex() {
         const fetchProfileAndStats = async () => {
             setLoading(true);
 
+            // Get current user
             const { data: authData } = await supabase.auth.getUser();
             const userId = authData.user?.id;
             if (!userId) {
@@ -51,19 +51,22 @@ export default function ProfileIndex() {
                 return;
             }
 
-            const { data: user } = await supabase
+            // Fetch profile
+            const { data: user, error: userError } = await supabase
                 .from("users")
                 .select("*")
                 .eq("id", userId)
                 .single();
 
-            setUserData(user);
+            if (userError) console.error("Error fetching user:", userError);
+            else setUserData(user);
 
+            // Fetch statistics in parallel
             const [
-                { data: studyTasks },
-                { count: studyGroupsCount },
-                { count: goalsCount },
-                { count: forumPostsCount },
+                { data: studyTasks, error: tasksError },
+                { count: studyGroupsCount, error: groupsError },
+                { count: goalsCount, error: goalsError },
+                { count: forumPostsCount, error: postsError },
             ] = await Promise.all([
                 supabase
                     .from("tasks")
@@ -86,6 +89,15 @@ export default function ProfileIndex() {
                     .eq("senderId", userId),
             ]);
 
+            if (tasksError || groupsError || goalsError || postsError)
+                console.error("Error fetching stats:", {
+                    tasksError,
+                    groupsError,
+                    goalsError,
+                    postsError,
+                });
+
+            // Calculate total study hours
             const totalStudyHours = studyTasks
                 ? studyTasks.reduce(
                       (sum, row) => sum + Number(row.estimated_hours || 0),
@@ -117,9 +129,7 @@ export default function ProfileIndex() {
     if (!userData) {
         return (
             <View style={styles.loadingContainer}>
-                <Text style={{ color: theme.colors.text }}>
-                    No user data found.
-                </Text>
+                <Text>No user data found.</Text>
             </View>
         );
     }
@@ -138,100 +148,61 @@ export default function ProfileIndex() {
                 { backgroundColor: theme.colors.background },
             ]}
         >
-            {/* HEADER */}
+            {/* --- HEADER --- */}
             <View style={styles.headerRow}>
                 <View>
-                    <Text style={[styles.title, { color: theme.colors.text }]}>
-                        My Profile
-                    </Text>
-                    <Text
-                        style={[
-                            styles.subtitle,
-                            { color: theme.colors.text + "99" },
-                        ]}
-                    >
+                    <Text style={styles.title}>My Profile</Text>
+                    <Text style={styles.subtitle}>
                         Manage your academic profile and preferences
                     </Text>
                 </View>
-
                 <View style={styles.headerIcons}>
                     <TouchableOpacity
-                        style={[
-                            styles.iconButton,
-                            {
-                                backgroundColor: theme.colors.card,
-                                borderColor: theme.colors.border,
-                            },
-                        ]}
+                        style={styles.iconButton}
                         onPress={() => router.push("/profile/edit")}
                     >
                         <Ionicons
                             name="create-outline"
                             size={18}
-                            color={theme.colors.text}
+                            color="#111"
                         />
                     </TouchableOpacity>
-
                     <TouchableOpacity
-                        style={[
-                            styles.iconButton,
-                            {
-                                backgroundColor: theme.colors.card,
-                                borderColor: theme.colors.border,
-                            },
-                        ]}
+                        style={styles.iconButton}
                         onPress={() => router.push("/profile/setting")}
                     >
                         <Ionicons
                             name="settings-outline"
                             size={18}
-                            color={theme.colors.text}
+                            color="#111"
                         />
                     </TouchableOpacity>
                 </View>
             </View>
 
-            {/* PROFILE CARD */}
-            <View
-                style={[
-                    styles.profileCard,
-                    { backgroundColor: theme.colors.card },
-                ]}
-            >
-                <Image
-                    source={{
-                        uri:
-                            userData.avatarUrl ||
-                            "https://i.pravatar.cc/150?img=15",
-                    }}
-                    style={styles.avatar}
-                />
+            {/* --- PROFILE CARD --- */}
+            <View style={styles.profileCard}>
+                <View style={{ position: "relative", alignItems: "center" }}>
+                    <Image
+                        source={{
+                            uri:
+                                userData.avatarUrl ||
+                                "https://i.pravatar.cc/150?img=15",
+                        }}
+                        style={styles.avatar}
+                    />
+                </View>
 
-                <Text style={[styles.name, { color: theme.colors.text }]}>
-                    {userData.fullName}
-                </Text>
-
-                <Text
-                    style={[styles.role, { color: theme.colors.text + "AA" }]}
-                >
+                <Text style={styles.name}>{userData.fullName}</Text>
+                <Text style={styles.role}>
                     {userData.role === "student"
                         ? userData.major || "Computer Science Student"
                         : "Administrator"}
                 </Text>
 
                 {userData.role === "student" && (
-                    <View
-                        style={[
-                            styles.badge,
-                            { backgroundColor: theme.colors.primary + "22" },
-                        ]}
-                    >
-                        <Text
-                            style={[
-                                styles.badgeText,
-                                { color: theme.colors.background },
-                            ]}
-                        >
+                    <View style={styles.badge}>
+                        <Text style={styles.badgeText}>
                             {userData.academicYear || "Junior"}
                         </Text>
                     </View>
@@ -239,19 +210,8 @@ export default function ProfileIndex() {
 
                 <View style={styles.infoContainer}>
                     <View style={styles.infoRow}>
-                        <Ionicons
-                            name="mail-outline"
-                            size={18}
-                            color={theme.colors.text}
-                        />
-                        <Text
-                            style={[
-                                styles.infoText,
-                                { color: theme.colors.text },
-                            ]}
-                        >
-                            {userData.email}
-                        </Text>
+                        <Ionicons name="mail-outline" size={18} color="#555" />
+                        <Text style={styles.infoText}>{userData.email}</Text>
                     </View>
 
                     {userData.phone && (
@@ -259,14 +219,9 @@ export default function ProfileIndex() {
                             <Ionicons
                                 name="call-outline"
                                 size={18}
-                                color={theme.colors.text}
+                                color="#555"
                             />
-                            <Text
-                                style={[
-                                    styles.infoText,
-                                    { color: theme.colors.text },
-                                ]}
-                            >
+                            <Text style={styles.infoText}>
                                 {userData.phone}
                             </Text>
                         </View>
@@ -277,161 +232,21 @@ export default function ProfileIndex() {
                             <Ionicons
                                 name="id-card-outline"
                                 size={18}
-                                color={theme.colors.text}
+                                color="#555"
                             />
-                            <Text
-                                style={[
-                                    styles.infoText,
-                                    { color: theme.colors.text },
-                                ]}
-                            >
+                            <Text style={styles.infoText}>
                                 {userData.studentId}
                             </Text>
                         </View>
                     )}
-
                     <View style={styles.infoRow}>
                         <Ionicons
                             name="calendar-outline"
                             size={18}
-                            color={theme.colors.text}
+                            color="#555"
                         />
-                        <Text
-                            style={[
-                                styles.infoText,
-                                { color: theme.colors.text },
-                            ]}
-                        >
-                            Joined {joinDate}
-                        </Text>
+                        <Text style={styles.infoText}>Joined {joinDate}</Text>
                     </View>
-                </View>
-            </View>
-
-            {/* ABOUT */}
-            <View style={[styles.card, { backgroundColor: theme.colors.card }]}>
-                <View style={styles.sectionHeader}>
-                    <Ionicons
-                        name="person-outline"
-                        size={18}
-                        color={theme.colors.text}
-                    />
-                    <Text
-                        style={[
-                            styles.sectionTitle,
-                            { color: theme.colors.text },
-                        ]}
-                    >
-                        About Me
-                    </Text>
-                </View>
-                <Text
-                    style={[
-                        styles.paragraph,
-                        { color: theme.colors.text + "AA" },
-                    ]}
-                >
-                    {userData.description || "No description provided yet."}
-                </Text>
-            </View>
-
-            {/* INTERESTS */}
-            {userData.interests?.length > 0 && (
-                <View
-                    style={[
-                        styles.card,
-                        { backgroundColor: theme.colors.card },
-                    ]}
-                >
-                    <View style={styles.sectionHeader}>
-                        <Ionicons
-                            name="school-outline"
-                            size={18}
-                            color={theme.colors.text}
-                        />
-                        <Text
-                            style={[
-                                styles.sectionTitle,
-                                { color: theme.colors.text },
-                            ]}
-                        >
-                            Academic Interests
-                        </Text>
-                    </View>
-
-                    <View style={styles.tagsContainer}>
-                        {userData.interests.map((interest) => (
-                            <View
-                                key={interest}
-                                style={[
-                                    styles.tag,
-                                    { backgroundColor: theme.colors.border },
-                                ]}
-                            >
-                                <Text
-                                    style={[
-                                        styles.tagText,
-                                        { color: theme.colors.text },
-                                    ]}
-                                >
-                                    {interest}
-                                </Text>
-                            </View>
-                        ))}
-                    </View>
-                </View>
-            )}
-
-            {/* STUDY STATS */}
-            <View style={[styles.card, { backgroundColor: theme.colors.card }]}>
-                <View style={styles.sectionHeader}>
-                    <Ionicons
-                        name="stats-chart-outline"
-                        size={18}
-                        color={theme.colors.text}
-                    />
-                    <Text
-                        style={[
-                            styles.sectionTitle,
-                            { color: theme.colors.text },
-                        ]}
-                    >
-                        Study Statistics
-                    </Text>
-                </View>
-
-                <View style={styles.statsGrid}>
-                    {[
-                        ["Total Study Hours", stats.totalStudyHours],
-                        ["Study Groups Joined", stats.studyGroups],
-                        ["Goals Completed", stats.goalsCompleted],
-                        ["Forum Posts", stats.forumPosts],
-                    ].map(([label, value]) => (
-                        <View
-                            key={label}
-                            style={[
-                                styles.statBox,
-                                { backgroundColor: theme.colors.border },
-                            ]}
-                        >
-                            <Text
-                                style={[
-                                    styles.statNumber,
-                                    { color: theme.colors.text },
-                                ]}
-                            >
-                                {value}
-                            </Text>
-                            <Text
-                                style={[
-                                    styles.statLabel,
-                                    { color: theme.colors.text + "AA" },
-                                ]}
-                            >
-                                {label}
-                            </Text>
-                        </View>
-                    ))}
                 </View>
             </View>
         </ScrollView>
@@ -462,6 +277,7 @@ const styles = StyleSheet.create({
     title: { fontSize: 22, fontWeight: "700", color: "#111" },
     subtitle: { fontSize: 13, color: "#555", marginTop: 2 },
     profileCard: {
+        backgroundColor: "#fff",
         borderRadius: 16,
         paddingVertical: 20,
         paddingHorizontal: 16,

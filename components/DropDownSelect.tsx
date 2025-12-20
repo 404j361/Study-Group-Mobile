@@ -20,7 +20,7 @@ export default function DropdownSelect({
     const theme = useTheme();
 
     return (
-        <View style={{ marginBottom: 16 }}>
+        <View style={{ marginBottom: 8, marginTop: 16 }}>
             <Text style={{ color: theme.colors.text, marginBottom: 6 }}>
                 {label}
             </Text>

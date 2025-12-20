@@ -7,7 +7,7 @@ type StatCardProps = {
     title: string;
     value: string | number;
     icon: React.ReactNode;
-    change: string;
+    change?: string;
 };
 
 export default function StatCard({
@@ -34,18 +34,25 @@ export default function StatCard({
                 </Text>
                 {icon}
             </View>
-            <View
-                style={{
-                    ...styles.badge,
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    borderColor: theme.colors.text,
-                }}
-            >
-                <Text style={{ ...styles.badgeText, color: theme.colors.text }}>
-                    {change}
-                </Text>
-            </View>
+            {change && (
+                <View
+                    style={{
+                        ...styles.badge,
+                        borderWidth: 1,
+                        borderRadius: 10,
+                        borderColor: theme.colors.text,
+                    }}
+                >
+                    <Text
+                        style={{
+                            ...styles.badgeText,
+                            color: theme.colors.text,
+                        }}
+                    >
+                        {change}
+                    </Text>
+                </View>
+            )}
         </View>
     );
 }

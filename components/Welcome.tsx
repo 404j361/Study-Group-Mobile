@@ -96,7 +96,7 @@ export default function Welcome() {
                 animated: true,
             });
         } else {
-            router.replace("/sign-in");
+            router.replace("/(auth)/sign-in");
         }
     };
 

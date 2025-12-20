@@ -2,7 +2,7 @@ import { SessionContext } from "@/app/_layout";
 import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import {
     ActivityIndicator,
@@ -130,11 +130,13 @@ export default function FlashCard() {
             {/* HEADER */}
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
-                    <Ionicons
-                        name="arrow-back"
-                        size={22}
-                        color={theme.colors.text}
-                    />
+                    <Link style={{ marginTop: 5 }} href={"/study-hub"}>
+                        <Ionicons
+                            name="arrow-back"
+                            size={22}
+                            color={theme.colors.text}
+                        />
+                    </Link>
                     <View>
                         <Text
                             style={[

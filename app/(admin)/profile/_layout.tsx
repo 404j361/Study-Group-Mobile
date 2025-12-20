@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 
-export default function StudyHubLayout() {
+export default function ProgressLayout() {
     return (
         <Stack
             screenOptions={{

@@ -66,7 +66,7 @@ export default function RootLayout() {
                             contentStyle: { paddingTop: insets.top },
                         }}
                     >
-                        <Stack.Screen name="index" />
+                        <Stack.Screen name="(landing)" />
                         <Stack.Screen name="(auth)" />
                     </Stack>
                 )}

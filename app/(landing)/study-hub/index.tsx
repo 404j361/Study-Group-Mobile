@@ -45,7 +45,7 @@ export default function StudyHubIndex() {
                         />
                     }
                     title="Study Materials"
-                    onPress={() => router.push("/")}
+                    onPress={() => router.push("/study-hub/study-materials")}
                 />
                 <StudyCard
                     icon={
@@ -78,7 +78,7 @@ export default function StudyHubIndex() {
                         />
                     }
                     title="Forums"
-                    onPress={() => router.push("/")}
+                    onPress={() => router.push("/study-hub/forum")}
                 />
             </View>
         </ScrollView>

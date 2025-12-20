@@ -13,8 +13,10 @@ export default function ProgressRow({
     current,
     total,
 }: ProgressRowProps) {
-    const progress = Math.min(current / total, 1);
     const theme = useTheme();
+
+    const rawProgress = total > 0 ? current / total : 0;
+    const progress = Math.min(rawProgress, 1);
 
     return (
         <View style={{ marginBottom: 16 }}>
